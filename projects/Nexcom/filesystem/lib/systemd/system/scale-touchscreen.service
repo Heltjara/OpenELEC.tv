@@ -1,0 +1,13 @@
+[Unit]
+Description=Scale touchscreen.
+After=ratpoison.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/scale_touchscreen
+RemainAfterExit=No
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target

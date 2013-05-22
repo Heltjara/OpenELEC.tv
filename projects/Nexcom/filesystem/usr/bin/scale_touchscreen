@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#wait for xbmc to start
+#while [ "x$(pidof xbmc.bin)" = "x" ]; do
+#     usleep 1000000
+#done
+#wait for 5 sec for xbmc to start completely
+#usleep 5000000
+
+echo "Scaling touchscreen"
+
+DVI_enabled=$(xrandr | grep 'DVI1.*connected') 
+
+if [ "x${DVI_enabled}" != "x" ]; then
+
+  DVI=$(xrandr | grep -A1 "DVI1" | grep -o "[0-9]\{1,4\}x[0-9]\{1,4\} ")
+  DVI_x=$(echo $DVI | cut -d'x' -f1)
+  DVI_y=$(echo $DVI | cut -d'x' -f2)
+  VGA=$(xrandr | grep -A1 "VGA1" | grep -o "[0-9]\{1,4\}x[0-9]\{1,4\} ")
+  VGA_x=$(echo $VGA | cut -d'x' -f1)
+  VGA_y=$(echo $VGA | cut -d'x' -f2)
+
+
+  test -z $ADDITIONAL_SCALE_x && ADDITIONAL_SCALE_x=1.0
+  test -z $ADDITIONAL_SCALE_y && ADDITIONAL_SCALE_y=1.0
+
+  SCALE_x=$(awk "BEGIN { print ($DVI_x*$ADDITIONAL_SCALE_x)/$VGA_x }")
+  SCALE_y=$(awk "BEGIN { print ($DVI_y*$ADDITIONAL_SCALE_y)/$VGA_y }")
+
+  xrandr
+  echo "Scaling to x:${SCALE_x} y:${SCALE_y}"
+  xrandr --output VGA1 --auto --scale ${SCALE_x}x${SCALE_y}
+else
+  xrandr --output VGA1 --auto --scale 1x1
+fi
+
+echo "Done scaling touchscreen"
+

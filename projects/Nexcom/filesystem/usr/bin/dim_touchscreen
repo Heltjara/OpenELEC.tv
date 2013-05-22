@@ -1,0 +1,13 @@
+#!/bin/bash
+
+event=`cat /proc/bus/input/devices | grep -A4 "eGalax Inc. USB TouchController" | grep -oE "event[0-9]{1,2}"`
+touch_input=/dev/input/$event
+
+set_brightness ()
+{
+ xrandr --output VGA1 --brightness $1
+}
+
+set_brightness 0.5
+
+(head -c 1 $touch_input &>/dev/null && set_brightness 1.0)&
